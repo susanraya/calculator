@@ -128,7 +128,7 @@ export default function Screen() {
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [cleared, setCleared] = React.useState(false);
   const [confirmClear, setConfirmClear] = React.useState(false);
-  const [flash, setFlash] = React.useState<{ key: Key; n: number } | null>(null);
+  const [flash, setFlash] = React.useState<Key | null>(null);
 
   const calcRef = React.useRef(calc);
   calcRef.current = calc;
@@ -137,7 +137,6 @@ export default function Screen() {
   const confirmRef = React.useRef(confirmClear);
   confirmRef.current = confirmClear;
   const idRef = React.useRef(0);
-  const flashRef = React.useRef(0);
 
   React.useEffect(() => {
     if (!flash) return undefined;
@@ -225,8 +224,7 @@ export default function Screen() {
   };
 
   const press = (key: Key) => {
-    flashRef.current += 1;
-    setFlash({ key, n: flashRef.current });
+    setFlash(key);
     act(key);
   };
 
@@ -261,7 +259,7 @@ export default function Screen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pressedKey = flash ? flash.key : null;
+  const pressedKey = flash;
   const isDiv0 = calc.error === DIVIDE_BY_ZERO_MESSAGE;
   const locked = isDiv0;
   const shown = group(calc.entry);
@@ -282,7 +280,7 @@ export default function Screen() {
     label: opts.label || key,
     aria: opts.aria,
     variant: opts.variant,
-    span: opts.span || "col-span-3 lg:col-span-2",
+    span: opts.span,
     pressed: pressedKey === key,
     disabled: opts.disabled,
     onPress: () => press(key),
