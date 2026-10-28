@@ -28,13 +28,6 @@ interface HistoryEntry {
   result: string;
 }
 
-const SEED_HISTORY: HistoryEntry[] = [
-  { id: 4, expr: "7 × 8", result: "56" },
-  { id: 3, expr: "120 ÷ 4", result: "30" },
-  { id: 2, expr: "240 × 50%", result: "120" },
-  { id: 1, expr: "12.75 + 3.5", result: "16.25" },
-];
-
 const DISPLAY_OP: Record<Operator, string> = { "+": "+", "-": "−", "*": "×", "/": "÷" };
 const OP_NAMES: Record<Operator, string> = {
   "+": "Add",
@@ -132,7 +125,7 @@ export default function Screen() {
   const [calc, setCalc] = React.useState<CalcState>(initialState);
   const [tape, setTape] = React.useState<string>("");
   const [label, setLabel] = React.useState<string | null>(null);
-  const [history, setHistory] = React.useState<HistoryEntry[]>(SEED_HISTORY);
+  const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [cleared, setCleared] = React.useState(false);
   const [confirmClear, setConfirmClear] = React.useState(false);
   const [flash, setFlash] = React.useState<{ key: Key; n: number } | null>(null);
@@ -143,7 +136,7 @@ export default function Screen() {
   labelRef.current = label;
   const confirmRef = React.useRef(confirmClear);
   confirmRef.current = confirmClear;
-  const idRef = React.useRef(100);
+  const idRef = React.useRef(0);
   const flashRef = React.useRef(0);
 
   React.useEffect(() => {
@@ -625,9 +618,7 @@ export default function Screen() {
         <KeyBtn {...keyProps("1", { wf: "b-6-0", disabled: locked })} />
         <KeyBtn {...keyProps("2", { wf: "b-6-1", disabled: locked })} />
         <KeyBtn {...keyProps("3", { wf: "b-6-2", disabled: locked })} />
-        <KeyBtn
-          {...keyProps("+", { wf: "b-6-3", aria: "Add", variant: "op", disabled: locked })}
-        />
+        <KeyBtn {...keyProps("+", { wf: "b-6-3", aria: "Add", variant: "op", disabled: locked })} />
 
         <p data-wf="b-6-4" className={sideNote} style={noteStyle}>
           <span className={labelClass} style={{ color: muted }}>

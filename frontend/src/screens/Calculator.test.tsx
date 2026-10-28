@@ -1,4 +1,4 @@
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 
@@ -38,8 +38,14 @@ const KEY = {
   AC: "b-3-0",
 };
 
+const CLEAR_HISTORY_WF = "b-3-4";
+
 function output(): HTMLElement {
   return document.querySelector("output") as HTMLElement;
+}
+
+function sessionCount(): string | null {
+  return document.querySelector('[data-wf="b-0-0"] span.block')?.textContent ?? null;
 }
 
 describe("Calculator screen", () => {
@@ -148,5 +154,77 @@ describe("Calculator screen", () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+
+  it("history starts empty on first load with no seeded sample data", () => {
+    renderScreen();
+    expect(screen.getByText("No calculations yet")).toBeInTheDocument();
+    expect(sessionCount()).toBe("00");
+  });
+
+  it("[AC-025] completing a calculation with = adds the expression and result to the client-side history list", () => {
+    renderScreen();
+    click(KEY["7"]);
+    click(KEY["*"]);
+    click(KEY["8"]);
+    click(KEY["="]);
+    expect(screen.getByText("7 × 8")).toBeInTheDocument();
+    expect(sessionCount()).toBe("01");
+
+    click(KEY["+"]);
+    click(KEY["4"]);
+    click(KEY["="]);
+    expect(sessionCount()).toBe("02");
+  });
+
+  it("[AC-026] no fetch is issued while calculations are added to history", () => {
+    const originalFetch = globalThis.fetch;
+    let called = false;
+    globalThis.fetch = (() => {
+      called = true;
+      return Promise.reject(new Error("should not be called"));
+    }) as typeof fetch;
+    try {
+      renderScreen();
+      click(KEY["7"]);
+      click(KEY["*"]);
+      click(KEY["8"]);
+      click(KEY["="]);
+      expect(sessionCount()).toBe("01");
+      expect(called).toBe(false);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("[AC-027] choosing clear history removes all entries and shows the empty state", () => {
+    renderScreen();
+    click(KEY["7"]);
+    click(KEY["*"]);
+    click(KEY["8"]);
+    click(KEY["="]);
+    expect(sessionCount()).toBe("01");
+
+    click(CLEAR_HISTORY_WF);
+    expect(screen.getByText(/Delete 1 entry\?/)).toBeInTheDocument();
+    click(CLEAR_HISTORY_WF);
+
+    expect(sessionCount()).toBe("00");
+    expect(screen.getByText("History cleared")).toBeInTheDocument();
+  });
+
+  it("[AC-027] Escape cancels the clear-history confirmation and keeps entries", () => {
+    renderScreen();
+    click(KEY["7"]);
+    click(KEY["*"]);
+    click(KEY["8"]);
+    click(KEY["="]);
+    click(CLEAR_HISTORY_WF);
+    expect(screen.getByText(/Delete 1 entry\?/)).toBeInTheDocument();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(screen.queryByText(/Delete 1 entry\?/)).not.toBeInTheDocument();
+    expect(sessionCount()).toBe("01");
   });
 });
