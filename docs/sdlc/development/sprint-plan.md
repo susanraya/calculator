@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start sprints -->
 ## Sprint 1: Sprint 1
 
-Core arithmetic engine: number entry, four operations, running result, clear/all-clear, percentage, plus no-login and no-personal-data baseline
+Core arithmetic engine (entry, four operations, running result, clear/all-clear, percentage) plus anonymous-access baseline and privacy documentation.
 
 Capacity: 20 points · Committed: 19
 
@@ -21,32 +21,32 @@ Capacity: 20 points · Committed: 19
 
 ## Sprint 2: Sprint 2
 
-Input methods (on-screen buttons, keyboard), responsive/low-bandwidth delivery, and optional client-side history
+On-screen and keyboard input wired to the engine, responsive layout, and low-bandwidth load performance.
 
-Capacity: 20 points · Committed: 18
+Capacity: 20 points · Committed: 16
 
 | Key | Type | Title | Points | Role | Depends on |
 |---|---|---|---|---|---|
-| US-006 | Story | Operate the calculator with on-screen buttons | 5 | frontend-agent | US-001, US-002, US-003, US-004, US-005 |
+| US-006 | Story | Operate the calculator with on-screen buttons | 5 | frontend-agent | US-001, US-002, US-004 |
 | US-007 | Story | Operate the calculator with the keyboard | 3 | frontend-agent | US-006 |
-| US-008 | Story | Use the calculator on mobile and desktop screens | 3 | frontend-agent | US-006 |
-| US-009 | Story | Work on low-bandwidth connections | 2 | frontend-agent | US-008 |
-| US-012 | Story | View recent calculations in the browser | 5 | frontend-agent | US-002, US-003 |
+| US-008 | Story | Use the calculator on mobile and desktop screens | 5 | frontend-agent | US-006 |
+| US-009 | Story | Work on low-bandwidth connections | 3 | frontend-agent | US-008 |
 
 ## Sprint 3: Sprint 3
 
-WCAG 2.1 AA accessibility implementation and release-gate audit
+Optional client-side history and WCAG 2.1 AA accessibility conformance as the release gate.
 
-Capacity: 20 points · Committed: 11
+Capacity: 20 points · Committed: 16
 
 | Key | Type | Title | Points | Role | Depends on |
 |---|---|---|---|---|---|
+| US-012 | Story | View recent calculations in the browser | 5 | frontend-agent | US-002, US-003 |
 | US-013 | Story | Fully operable by keyboard and assistive technology | 8 | frontend-agent | US-006, US-007 |
-| ↳ US-013-T1 | Task | Add ARIA labels and roles to all calculator buttons and the display | — | frontend-agent | — |
-| ↳ US-013-T2 | Task | Implement keyboard focus management and visible focus indicators | — | frontend-agent | — |
-| ↳ US-013-T3 | Task | Add aria-live region to announce result changes | — | frontend-agent | — |
-| ↳ US-013-T4 | Task | Write automated accessibility and keyboard-navigation test suite | — | qa-agent | — |
-| US-014 | Story | Accessibility conformance as a release gate | 3 | qa-agent | US-013 |
+| ↳ US-013-T1 | Task | Add ARIA labels and roles to all calculator controls and the result display | — | frontend-agent | — |
+| ↳ US-013-T2 | Task | Implement keyboard focus order and visible focus indicators | — | frontend-agent | — |
+| ↳ US-013-T3 | Task | Add live-region announcements for result updates | — | frontend-agent | — |
+| ↳ US-013-T4 | Task | Write automated keyboard and screen-reader accessibility test suite | — | qa-agent | — |
+| US-014 | Story | Accessibility conformance as a release gate | 3 | qa-agent | US-013, US-008 |
 
 ## Unscheduled
 

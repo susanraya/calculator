@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 simple calculator application
 
-**Documentation version:** v2
+**Documentation version:** v3
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -15,7 +15,7 @@ simple calculator application
 |---|---|
 | [Requirements](requirements/README.md) | v1 approved |
 | [Architecture](architecture/README.md) | 13 entries |
-| [Development](development/README.md) | 1 entry |
+| [Development](development/README.md) | 11 entries |
 | [Testing](testing/README.md) | 1 entry |
 | [Deployment](deployment/README.md) | 1 entry |
 | [Maintenance](maintenance/README.md) | 1 entry |
@@ -31,7 +31,7 @@ simple calculator application
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 14 requirements |
-| [Changelog](CHANGELOG.md) | 2 versions |
+| [Changelog](CHANGELOG.md) | 3 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -63,7 +63,18 @@ simple calculator application
 
 ### Development
 
-- Development phase has not started -- no code, tickets, or implementation evidence exists for any of the 14 user stories in the requirements phase.
+- Backlog items are not explicitly mapped to individual sprints in the input -- only sprint-level goals and item-level epic groupings are given; which specific stories/tasks landed in which sprint is not confirmed.
+- No actual development progress (commits, PRs, build status) or ticket completion state was provided for this phase -- only planned backlog content exists.
+- No confirmation of which backlog items were actually completed within this sprint.
+- No audit results or release-gate decision provided yet.
+- No implementation or completion status reported for any of these stories.
+- No implementation or completion status reported for this story.
+- No implementation or completion status reported for these stories.
+- No performance/bandwidth test data provided to confirm the low-bandwidth requirement is met.
+- No security-agent verification/report provided confirming no personal data is collected or stored.
+- Not stated whether history persists across sessions or is purely in-memory/client-side only.
+- No implementation or completion status reported for the story or its subtasks.
+- No audit/test results provided yet to confirm WCAG 2.1 AA conformance or to support the release-gate decision for US-014.
 
 ### Testing
 
