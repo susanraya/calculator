@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 simple calculator application
 
-**Documentation version:** v1
+**Documentation version:** v2
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -31,7 +31,7 @@ simple calculator application
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 14 requirements |
-| [Changelog](CHANGELOG.md) | 1 version |
+| [Changelog](CHANGELOG.md) | 2 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -57,6 +57,8 @@ simple calculator application
 
 ### Testing
 
-- The specific checks are not named, so it cannot be confirmed whether they cover arithmetic correctness, divide-by-zero handling, keyboard/on-screen input parity, responsive/low-bandwidth behaviour, client-side history, or the WCAG 2.1 AA release-gate criteria (AC-028–AC-031) and the automated accessibility suite planned under US-013-T4.
-- No test records exist specifically for Sprint 2/3 scope (US-006–US-009, US-012, US-013, US-014).
+- No mapping is given between the 4 passed checks and any of the known requirement keys (US-001 through US-014), so requirement-level test coverage cannot be confirmed.
+- No test case names, test type (unit/integration/manual), or tooling were specified.
+- No ticket was associated with this check run.
+- No record of any failed or skipped checks, defect reports, or manual QA activity for this phase.
 <!-- sdlc:auto:end open-gaps -->
