@@ -5,15 +5,102 @@
 <!-- sdlc:auto:start narrative -->
 ## Overview
 
-### ARCH-000 · draft
+### ARCH-OVERVIEW · approved · source: architecture:summary
 
-No architecture-phase input has been provided for this project.
+Overall architecture is a browser-only calculator: all arithmetic runs client-side in React 19, a FastAPI service only hosts static files and a health check, and PostgreSQL is provisioned but intentionally holds no user data.
 
-Architecture phase has not started. The requirements phase names an approved technology stack (FastAPI, AWS, PostgreSQL, React) and asks for AWS Mumbai-region hosting, a CDN, and a health/status endpoint, but no architecture diagrams, component design, API contracts, data model, or infrastructure design have been produced yet.
+Approved, version 1. Product is free and fully anonymous, targeted at Indian higher-education students and staff. Supported operations: add, subtract, multiply, divide, percentage, decimals, running result, clear/all-clear, driven by keyboard and on-screen input into one shared state. Optional calculation history lives only in the browser. FastAPI 0.115 hosts the static app and exposes a health endpoint so AWS can sustain availability through term-start and exam peaks, served from the AWS Mumbai region behind a CDN for low-bandwidth mobile access. PostgreSQL 16 is provisioned as the platform standard but stores no user data by design, which the architecture states keeps DPDP, parental-consent and CERT-In data obligations out of material scope. WCAG 2.1 AA / RPwD / GIGW accessibility is treated as a release gate.
 
-**Related:** REQ-STACK, REQ-NFR-003
+- ⚠ No explicit mapping given from this architecture to any of the known requirement ids (US-001..US-014); traceability cannot be confirmed without that linkage.
+- ⚠ Claim that 'no user data stored' keeps DPDP/CERT-In obligations out of scope is an architectural design intent, not a confirmed legal/compliance determination -- flagged for human legal review, not asserted as fact here.
 
-- ⚠ Architecture phase has not started -- no design documentation exists to verify how the approved stack will be assembled (e.g., FastAPI health endpoint contract, AWS region/CDN topology, React app structure).
+### ARCH-COMP-FE · approved · source: architecture:components:frontend
+
+Calculator Web App built in React 19, the sole place where arithmetic happens.
+
+Renders the responsive, accessible calculator UI; handles all digit/operator/percentage/decimal entry from both on-screen buttons and keyboard; performs all arithmetic client-side; shows the running result and a divide-by-zero message; keeps optional calculation history in the browser only.
+
+- ⚠ Not linked to a specific requirement id in the input.
+
+### ARCH-COMP-BE · approved · source: architecture:components:backend
+
+App Host & Health Service built on FastAPI 0.115, serves static assets and a health endpoint only.
+
+Serves the built static React app and exposes a health/status endpoint so load balancing and monitoring can confirm availability during traffic peaks. Explicitly performs no calculation and stores no user data.
+
+- ⚠ Not linked to a specific requirement id in the input.
+
+### ARCH-COMP-DB · approved · source: architecture:components:database
+
+PostgreSQL 16 is provisioned as the platform-standard database but is unused by design in this product.
+
+Platform-standard relational database, provisioned for possible future server-side persistence. Holds no user data in this product, which the architecture states keeps personal-data obligations out of scope.
+
+- ⚠ Not linked to a specific requirement id in the input.
+- ⚠ Decision to leave the database unused is a design choice recorded here, not independently verified against any data-retention requirement.
+
+### ARCH-CP-CALC · approved · source: architecture:critical_paths:Client-side calculation
+
+Describes the end-to-end flow of a calculation entirely inside the browser, with no network call.
+
+User enters numbers and operators via buttons or keyboard; the engine builds operands, applies the operator with defined decimal precision, handles divide-by-zero and percentage, updates the running result, and can clear (C) or reset (AC). No network request is made for this path.
+
+- ⚠ Decimal precision rules are referenced as 'defined' but the specific precision value/behavior is not given in this input.
+
+### ARCH-CP-DELIVERY · approved · source: architecture:critical_paths:App delivery and health
+
+Describes how the app is delivered to the browser and kept available under load.
+
+Browser requests the app; the CDN serves cached static assets or the FastAPI host returns them. Monitoring and the load balancer poll the health endpoint to keep the service available during peaks (term-start and exam periods).
+
+### ARCH-EP-HEALTH · approved · source: architecture:endpoints:GET /health
+
+Health/liveness endpoint used by infrastructure, not by end users.
+
+GET /health is a liveness/readiness probe used by the load balancer and monitoring to confirm the app host is serving during term-start and exam peaks. Referenced against NFR-003 in the architecture input, though NFR-003 is not among the known requirement keys supplied for this project.
+
+- ⚠ Architecture references 'NFR-003' but this id is not present in the known requirement key list (US-001..US-014); cannot confirm traceability.
+
+### ARCH-EP-SPA · approved · source: architecture:endpoints:GET /{path:path}
+
+Catch-all route serving the built single-page app.
+
+GET /{path:path} serves the built React single-page app (index and static assets); unmatched routes fall back to index.html for client-side routing.
+
+### ARCH-DEPLOY · approved · source: architecture:deployment_nodes
+
+Deployment topology spans CloudFront, S3, Fargate-hosted FastAPI, and a managed PostgreSQL instance, all on AWS.
+
+Nodes: CloudFront CDN (AWS global edge) for cached static delivery; Static Assets Bucket (Amazon S3) holding built frontend assets; App Host (FastAPI 0.115 on AWS Fargate/ECS, Python uvicorn container) serving the app and health endpoint; PostgreSQL (Amazon RDS for PostgreSQL 16) provisioned as platform standard but unused for user data. Served from the AWS Mumbai region for low latency to Indian users.
+
+### ARCH-TECH-FE · approved · source: architecture:technology_decisions:Frontend
+
+React 19 chosen for the frontend over Svelte and Vue.
+
+Rationale: the entire product runs in the browser; React 19 gives a single responsive SPA and a mature accessibility ecosystem (ARIA, focus management, screen-reader labels) to meet the WCAG 2.1 AA / RPwD release gate, and keeps the payload light for low-bandwidth mobile use. Alternatives considered: Svelte, Vue.
+
+### ARCH-TECH-BE · approved · source: architecture:technology_decisions:Backend
+
+FastAPI 0.115 chosen for the backend over Flask and Starlette.
+
+Rationale: the server's only job is to reliably serve the app and expose a health endpoint; FastAPI 0.115 is a light, dependable host that matches the platform default and stays healthy during peaks (referenced as NFR-003 in the input). Alternatives considered: Flask, Starlette.
+
+- ⚠ References 'NFR-003' which is not in the known requirement key list supplied for this project.
+
+### ARCH-TECH-DB · approved · source: architecture:technology_decisions:Database
+
+PostgreSQL 16 chosen as the platform-standard database with no current alternative needed.
+
+Rationale: provisioned as the platform standard for any future server-side persistence. No user data is written here, which the architecture states is precisely what keeps DPDP, parental-consent and CERT-In data duties out of material scope (referenced as NFR-009 in the input). No alternatives considered -- none needed for this product per the input.
+
+- ⚠ References 'NFR-009' which is not in the known requirement key list supplied for this project.
+- ⚠ The compliance-scope claim (DPDP/CERT-In out of scope) is a design rationale stated in the architecture, not a verified legal conclusion.
+
+### ARCH-TECH-CLOUD · approved · source: architecture:technology_decisions:Cloud
+
+AWS chosen as the cloud provider over Azure and GCP.
+
+Rationale: AWS has the Mumbai region for low latency to Indian users and CloudFront for fast low-bandwidth delivery, and scales cheaply for a very light read-only app during registration and exam peaks. Alternatives considered: Azure, GCP.
 <!-- sdlc:auto:end narrative -->
 
 <!-- sdlc:auto:start building-blocks -->

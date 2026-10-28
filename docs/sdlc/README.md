@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 simple calculator application
 
-**Documentation version:** v1
+**Documentation version:** v2
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -14,7 +14,7 @@ simple calculator application
 | Document | State |
 |---|---|
 | [Requirements](requirements/README.md) | v1 approved |
-| [Architecture](architecture/README.md) | 1 entry |
+| [Architecture](architecture/README.md) | 13 entries |
 | [Development](development/README.md) | 1 entry |
 | [Testing](testing/README.md) | 1 entry |
 | [Deployment](deployment/README.md) | 1 entry |
@@ -31,7 +31,7 @@ simple calculator application
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 14 requirements |
-| [Changelog](CHANGELOG.md) | 1 version |
+| [Changelog](CHANGELOG.md) | 2 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -51,7 +51,15 @@ simple calculator application
 
 ### Architecture
 
-- Architecture phase has not started -- no design documentation exists to verify how the approved stack will be assembled (e.g., FastAPI health endpoint contract, AWS region/CDN topology, React app structure).
+- No explicit mapping given from this architecture to any of the known requirement ids (US-001..US-014); traceability cannot be confirmed without that linkage.
+- Claim that 'no user data stored' keeps DPDP/CERT-In obligations out of scope is an architectural design intent, not a confirmed legal/compliance determination -- flagged for human legal review, not asserted as fact here.
+- Not linked to a specific requirement id in the input.
+- Decision to leave the database unused is a design choice recorded here, not independently verified against any data-retention requirement.
+- Decimal precision rules are referenced as 'defined' but the specific precision value/behavior is not given in this input.
+- Architecture references 'NFR-003' but this id is not present in the known requirement key list (US-001..US-014); cannot confirm traceability.
+- References 'NFR-003' which is not in the known requirement key list supplied for this project.
+- References 'NFR-009' which is not in the known requirement key list supplied for this project.
+- The compliance-scope claim (DPDP/CERT-In out of scope) is a design rationale stated in the architecture, not a verified legal conclusion.
 
 ### Development
 
