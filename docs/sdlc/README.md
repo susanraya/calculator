@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 simple calculator application
 
-**Documentation version:** v2
+**Documentation version:** v3
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -15,7 +15,7 @@ simple calculator application
 |---|---|
 | [Requirements](requirements/README.md) | v1 approved |
 | [Architecture](architecture/README.md) | 7 entries |
-| [Development](development/README.md) | 10 entries |
+| [Development](development/README.md) | 7 entries |
 | [Testing](testing/README.md) | 1 entry |
 | [Deployment](deployment/README.md) | 0 entries |
 | [Maintenance](maintenance/README.md) | 0 entries |
@@ -26,12 +26,12 @@ simple calculator application
 | [Developer guide](development/developer-guide.md) | generated |
 | [API reference](development/api-reference.md) | 2 routes |
 | [Test report](testing/test-report.md) | not run yet |
-| [Tests](testing/test-cases.md) | 14 tests |
+| [Tests](testing/test-cases.md) | 39 tests |
 | [Deployment guide](deployment/deployment-guide.md) | not deployed yet |
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 14 requirements |
-| [Changelog](CHANGELOG.md) | 2 versions |
+| [Changelog](CHANGELOG.md) | 3 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -52,8 +52,18 @@ simple calculator application
 
 ### Development
 
-- No delivery ticket or commit for US-006, US-007, US-008 or US-009 appears in the development run status, even though the overall development run is marked 'completed' — confirm whether Sprint 2 work actually shipped.
-- No delivery ticket or commit for US-012, US-013 (or tasks T1–T4), or US-014 appears in the development run status, despite the run being marked 'completed' — confirm whether the history feature and the WCAG 2.1 AA release-gate work actually shipped before relying on it.
+- Plan is explicitly marked 'preview, version 0' — not confirmed as finalized or approved.
+- No dates are given for any sprint, so the plan's timeline cannot be documented.
+- Discrepancy: run status says 'completed' but ticket evidence covers only 5 of 14 stories — unclear whether the remaining 9 stories were actually completed and simply not reported, or are genuinely outstanding.
+- No ticket record for US-001 (decimal entry) — core arithmetic input status unconfirmed.
+- No ticket record for US-002 (four operations) — core arithmetic operations status unconfirmed.
+- No ticket record for US-003 (running result) — status unconfirmed.
+- No ticket record for US-004 (clear/all-clear) — status unconfirmed.
+- No ticket record for US-005 (percentage) — status unconfirmed.
+- No ticket record for US-010 (anonymous access) — status unconfirmed.
+- No ticket record for US-011 (no personal data collected, security-agent) — status unconfirmed, notable since this is a privacy-relevant requirement.
+- No ticket record for US-013 or subtasks US-013-T1..T4 (WCAG 2.1 AA accessibility work) — status unconfirmed.
+- No ticket record for US-014 (accessibility conformance release gate) — status unconfirmed; if this story is in fact the release gate, its absence from delivered tickets raises a question about whether the release gate has been met.
 
 ### Testing
 

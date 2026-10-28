@@ -14,13 +14,13 @@ Built from recorded links, not written by a model: requirement key → plan item
 | US-003 | EPIC-001 | View a running result | US-003 | 1 | frontend | — | 49e68fd | delivered | not run | 0/2 tested · 0/2 passing | — |
 | US-004 | EPIC-001 | Clear and all-clear controls | US-004 | 1 | frontend | — | 49e68fd | delivered | not run | 0/2 tested · 0/2 passing | — |
 | US-005 | EPIC-002 | Calculate a percentage | US-005 | 1 | frontend | — | 49e68fd | delivered | not run | 0/2 tested · 0/2 passing | — |
-| US-006 | EPIC-003 | Operate the calculator with on-screen buttons | US-006 | 2 | frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
-| US-007 | EPIC-003 | Operate the calculator with the keyboard | US-007 | 2 | frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
-| US-008 | EPIC-004 | Use the calculator on mobile and desktop screens | US-008 | 2 | frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
-| US-009 | EPIC-004 | Work on low-bandwidth connections | US-009 | 2 | GET /health, GET /{path:path}, backend, frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
+| US-006 | EPIC-003 | Operate the calculator with on-screen buttons | US-006 | 2 | frontend | frontend/e2e/calculator-keypad.spec.ts, frontend/src/screens/Calculator.test.tsx, frontend/src/screens/Calculator.tsx | 105779b | delivered | not run | 2/2 tested · 2/2 passing | — |
+| US-007 | EPIC-003 | Operate the calculator with the keyboard | US-007 | 2 | frontend | — | 105779b | delivered | not run | 2/2 tested · 1/2 passing | — |
+| US-008 | EPIC-004 | Use the calculator on mobile and desktop screens | US-008 | 2 | frontend | — | 105779b | delivered | not run | 2/2 tested · 0/2 passing | — |
+| US-009 | EPIC-004 | Work on low-bandwidth connections | US-009 | 2 | GET /health, GET /{path:path}, backend, frontend | — | 105779b | delivered | not run | 1/2 tested · 0/2 passing | — |
 | US-010 | EPIC-005 | Use the calculator without login or accounts | US-010 | 1 | frontend | backend/tests/test_spa_and_scope.py, frontend/e2e/calculator-privacy.spec.ts | d3ca627 | delivered | not run | 2/2 tested · 0/2 passing | — |
 | US-011 | EPIC-005 | No personal data collected or stored | US-011 | 1 | frontend | — | d3ca627 | delivered | not run | 2/2 tested · 0/2 passing | — |
-| US-012 | EPIC-006 | View recent calculations in the browser | US-012 | 3 | frontend | — | — | not started | not run | 0/3 tested · 0/3 passing | — |
+| US-012 | EPIC-006 | View recent calculations in the browser | US-012 | 3 | frontend | backend/tests/test_availability.py, frontend/e2e/calculator-history.spec.ts, frontend/src/screens/Calculator.test.tsx, frontend/src/screens/Calculator.tsx | 105779b | delivered | not run | 3/3 tested · 0/3 passing | — |
 | US-013 | EPIC-007 | Fully operable by keyboard and assistive technology | US-013, US-013-T1, US-013-T2, US-013-T3, US-013-T4 | 3 | frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
 | US-014 | EPIC-007 | Accessibility conformance as a release gate | US-014 | 3 | frontend | — | — | not started | not run | 0/2 tested · 0/2 passing | — |
 <!-- sdlc:auto:end matrix -->

@@ -7,7 +7,7 @@ _Up to date._
 <!-- sdlc:auto:end status -->
 
 <!-- sdlc:auto:start source -->
-Generated from commit `01a6886` · model `claude-sonnet-5`
+Generated from commit `4489702` · model `claude-sonnet-5`
 <!-- sdlc:auto:end source -->
 
 <!-- sdlc:auto:start overview -->
