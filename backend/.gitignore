@@ -6,3 +6,6 @@ venv/
 .mypy_cache/
 *.db
 .env
+# Where backend/Dockerfile copies the frontend's production build (frontend/dist)
+# so this container can serve it at GET /{path:path}; never a source file to commit.
+static/
