@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 simple calculator application
 
-**Documentation version:** v3
+**Documentation version:** v4
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -31,7 +31,7 @@ simple calculator application
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 14 requirements |
-| [Changelog](CHANGELOG.md) | 3 versions |
+| [Changelog](CHANGELOG.md) | 4 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -67,8 +67,9 @@ simple calculator application
 
 ### Testing
 
-- No mapping is given between the 4 passed checks and any of the known requirement keys (US-001 through US-014), so requirement-level test coverage cannot be confirmed.
-- No test case names, test type (unit/integration/manual), or tooling were specified.
-- No ticket was associated with this check run.
-- No record of any failed or skipped checks, defect reports, or manual QA activity for this phase.
+- No breakdown of the 4 individual checks (names, scope, pass/fail per check) was provided.
+- No ticket or sprint reference was attached to this test run, so it cannot be traced to a specific piece of work.
+- No mapping given between these checks and any of the known requirements (US-001 through US-014), so requirement-level test coverage cannot be confirmed.
+- No date/timestamp was provided for when this run occurred.
+- No indication of whether this covers unit, integration, or end-to-end testing of the calculator.
 <!-- sdlc:auto:end open-gaps -->
