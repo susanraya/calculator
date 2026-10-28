@@ -5,99 +5,117 @@
 <!-- sdlc:auto:start narrative -->
 ## Summary
 
-### REQ-SCOPE · approved · source: requirements:delivery-scope
+### REQ-TECH-STACK · approved · source: requirements:technology-stack
 
-Defines the lightweight delivery scope for requirements v1 and explicitly excludes native/installable apps.
+Product owner approved an exact technology stack to design against: FastAPI 0.115 (backend), AWS (cloud), PostgreSQL 16 (database), React 19 (frontend). No substitutions permitted.
 
-Delivery scope is 'lightweight', requirements version 1. In-scope capabilities: four basic operations, percentage, decimal input, running result, clear/all-clear, on-screen buttons, keyboard entry, responsive low-bandwidth layout, anonymous public use with no login, and optional client-side-only history. Out of scope: native mobile or desktop installable calculator app.
+- Backend FastAPI 0.115: server only needs to reliably host the browser app and expose a health/status endpoint during term-start/exam peaks.
+- Cloud AWS: Mumbai region for low latency to Indian users plus global CDN for low-bandwidth mobile; scales cheaply for a light, read-only app.
+- Database PostgreSQL 16: included as platform standard for any future server-side persistence; by design the app stores no user data, which is stated as keeping DPDP, parental-consent and CERT-In data duties out of scope.
+- Frontend React 19: entire product runs client-side; chosen for a single responsive SPA and a mature accessibility ecosystem to meet the WCAG 2.1 AA / RPwD release gate on low-bandwidth mobile.
 
-### REQ-STACK · approved · source: requirements:technology-stack
+**Related:** EPIC-001, EPIC-002, EPIC-003, EPIC-004, EPIC-005, EPIC-006, EPIC-007
 
-Product owner approved an exact technology stack: FastAPI backend, AWS cloud, PostgreSQL database (unused by design), and React frontend.
+### REQ-SCOPE · draft · source: requirements:scope
 
-Backend: FastAPI 0.115, chosen to reliably serve the static-like app and expose a health/status endpoint during peak traffic. Cloud: AWS, chosen for Mumbai-region low latency to Indian users plus a global CDN for low-bandwidth mobile performance, scaling cheaply for a read-only app. Database: PostgreSQL 16, included as the platform standard but intentionally holds no data because the tool stores nothing server-side; this is explicitly used to keep DPDP/parental-consent/CERT-In duties out of scope. Frontend: React 19, chosen so all arithmetic runs client-side, supports low-bandwidth mobile, and eases WCAG 2.1 AA conformance (keyboard operability, ARIA labels, focus handling).
+Delivery scope is 'lightweight', requirements version 1. In-scope capabilities cover the full basic calculator feature set; native/installable mobile or desktop apps are explicitly out of scope.
 
-**Related:** NFR-001, NFR-002, NFR-003, NFR-008
+In scope: addition/subtraction/multiplication/division, percentage, decimal input, running result, clear/all-clear, on-screen buttons, keyboard entry, responsive low-bandwidth layout, anonymous public use with no login/accounts, optional client-side-only calculation history.
+Out of scope: native mobile or desktop app (installable iOS/Android/Windows calculator).
 
-- ⚠ No architecture-phase documentation exists yet translating this approved stack into an actual design (e.g., health endpoint contract, CDN/caching configuration, deployment topology) -- design against exactly this stack is still pending.
+**Related:** EPIC-001, EPIC-002, EPIC-003, EPIC-004, EPIC-005, EPIC-006, EPIC-007
 
-### EPIC-001 · approved · source: requirements:EPIC-001
+### EPIC-001 · draft · source: requirements:EPIC-001
 
-Core arithmetic: number entry including decimals, the four basic operations, a chainable running result, and clear/all-clear controls.
+Core arithmetic: entering whole/decimal numbers, the four basic operations, a running result, and clear/all-clear controls.
 
-US-001 (critical): digit entry builds a displayed number; a single decimal point per number is allowed, a second attempted decimal point is ignored (AC-001..AC-003). US-002 (critical): add/subtract/multiply/divide two operands with correct results; divide-by-zero shows a non-crashing error such as 'Cannot divide by zero'; decimal results use a consistent, defined precision (AC-004..AC-006). US-003 (high): selecting a new operator after a result applies it to the running result and next operand; re-requesting the result without new input keeps showing the current result (AC-007, AC-008). US-004 (high): clear (C) clears current entry while preserving running operation state; all-clear (AC) resets display and discards all stored operands/operators/results (AC-009, AC-010).
+- US-001 (critical): digits entered in sequence build the display value (AC-001); a decimal point can be added once per number (AC-002); a second decimal-point attempt is ignored (AC-003).
+- US-002 (critical): operator + second operand produces the correct arithmetic result (AC-004); dividing by zero shows a clear, non-crashing error such as 'Cannot divide by zero' instead of a number (AC-005); decimal results are shown to a consistent, defined precision without unexpected rounding artifacts (AC-006).
+- US-003 (high): a new operator+operand applies to the prior result for chained calculations (AC-007); requesting the result again with no new operand keeps showing the current running result (AC-008).
+- US-004 (high): Clear (C) erases only the current entry, preserving running operation state (AC-009); All-Clear (AC) resets the display and discards all stored operands/operators/results (AC-010).
+Epic assumption: supported operations are +, -, *, /, %, clear/all-clear and decimal input; percentage and input methods are covered in separate epics.
 
 **Related:** US-001, US-002, US-003, US-004, AC-001, AC-002, AC-003, AC-004, AC-005, AC-006, AC-007, AC-008, AC-009, AC-010
 
-- ⚠ AC-006 requires 'a consistent, defined precision' for decimal results but does not state what that precision actually is -- needs to be defined in design/development.
+### EPIC-002 · draft · source: requirements:EPIC-002
 
-### EPIC-002 · approved · source: requirements:EPIC-002
+Calculator supports a percentage operation, both standalone and relative to a prior operand.
 
-Percentage operation applied either to a single number or relative to a first operand mid-calculation.
-
-US-005 (high): activating percentage on an entered number converts it to a percentage value; when a first operand and operator are already set, percentage is calculated relative to that first operand and the running result updates (AC-011, AC-012).
+- US-005 (high): activating percentage on a single entered number converts it to its percentage value (e.g. 50 -> 0.5) (AC-011); with a first operand and operator already set, percentage is calculated relative to the first operand and the running result updates (AC-012).
 
 **Related:** US-005, AC-011, AC-012
 
-- ⚠ AC-011 gives two alternative behaviors ('50 becomes 0.5 or is applied against the current operand per the defined percentage behaviour') without settling on one -- the exact percentage semantics are not yet finalized.
+- ⚠ Exact percentage algorithm is described only as 'per the defined percentage behaviour' — the precise rule for the relative case (AC-012) is not fully pinned down in the requirements text.
 
-### EPIC-003 · approved · source: requirements:EPIC-003
+### EPIC-003 · draft · source: requirements:EPIC-003
 
-Calculator is operable via on-screen touch/pointer buttons and via physical/virtual keyboard, producing identical results.
+Both on-screen buttons and keyboard entry are supported and must produce identical results, usable interchangeably.
 
-US-006 (critical): tapping/clicking on-screen digit, operator, decimal, percentage, clear and all-clear buttons performs the action and updates the display; each button shows a visible pressed/active state (AC-013, AC-014). US-007 (high): keyboard number keys, operator keys (+, -, *, /), decimal key, Enter/= and Escape/Delete for clear each match their on-screen equivalents; keyboard and on-screen input can be mixed within one calculation against shared state (AC-015, AC-016).
+- US-006 (critical): tapping/clicking digit, operator, decimal, percentage, clear or all-clear buttons performs the action and updates the display (AC-013); each tapped button shows a visible pressed/active state (AC-014).
+- US-007 (high): number keys, operator keys (+,-,*,/), decimal key, Enter/= and Escape/Delete produce the same result as the equivalent on-screen button (AC-015); mixing keyboard and on-screen input within one calculation updates the same shared state consistently (AC-016).
 
 **Related:** US-006, US-007, AC-013, AC-014, AC-015, AC-016
 
-### EPIC-004 · approved · source: requirements:EPIC-004
+### EPIC-004 · draft · source: requirements:EPIC-004
 
-Responsive web delivery that works on mobile, tablet and desktop, and remains usable on low-bandwidth connections; no native app.
+Responsive web delivery for mobile and low-bandwidth use; no native/installable app is built.
 
-US-008 (high): on small mobile viewports all buttons/display are visible, legible and tappable without horizontal scroll or overlap (AC-017); on desktop viewports layout adapts while staying usable (AC-018). US-009 (medium): loads within a reasonable time with a lightweight payload on constrained connections and becomes fully usable (AC-019); once loaded, all calculation functions work client-side without further network requests (AC-020). Supported by NFR-001 (fast load on low bandwidth), NFR-002 (fully client-side computation), NFR-007 (responsive layout), NFR-008 (web-only, no native/installable app).
+- US-008 (high): small mobile viewports show all buttons/display legibly and tappably with no horizontal scrolling or overlap (AC-017); desktop viewports adapt the layout while keeping controls usable (AC-018).
+- US-009 (medium): the app loads within a reasonable time as a lightweight payload on constrained connections and becomes fully usable (AC-019); once loaded, all calculation functions run client-side with no further network requests (AC-020).
+Epic assumption: responsive web app only; native/installable mobile or desktop apps are explicitly out of scope.
 
 **Related:** US-008, US-009, AC-017, AC-018, AC-019, AC-020, NFR-001, NFR-002, NFR-007, NFR-008
 
-### EPIC-005 · approved · source: requirements:EPIC-005
+### EPIC-005 · draft · source: requirements:EPIC-005
 
-Free, anonymous, no-login public utility that collects and stores no personal data on any server.
+Free, public, anonymous utility: no login/accounts/payment, and no personal data is collected or stored, intended to keep India's DPDP, parental-consent and CERT-In data duties out of material scope.
 
-US-010 (critical): calculator is immediately usable on page load with no login/registration/account prompt, and no payment/subscription/billing is ever requested (AC-021, AC-022). US-011 (high): no personal data is collected, transmitted or stored on a server during any interaction (AC-023); this no-personal-data position is to be documented so that India's DPDP Act, parental-consent and CERT-In obligations remain out of material scope -- explicitly flagged in the requirement itself as 'an assumption to be confirmed' (AC-024). Compliance: DPDP Act 2023 (India) -- notice/consent, data-principal rights, breach notification, and verifiable parental consent for under-18 users are assumed not to apply because no personal data is processed; CERT-In's 6-hour incident reporting and 180-day log retention are likewise assumed out of scope on the same basis.
+- US-010 (critical): the calculator is immediately usable with no login, registration or account prompt (AC-021); no payment, subscription or billing is ever requested since it is free (AC-022).
+- US-011 (critical): no personal data is collected, transmitted to, or stored on a server during any interaction (AC-023).
+- Compliance trace — DPDP Act 2023 (India): AC-024 documents the assumption that, because no personal data is processed, DPDP data-principal/consent-manager duties, verifiable parental consent for minors, and CERT-In breach-notification duties remain out of material scope. This is explicitly labelled 'an assumption to be confirmed', not a verified legal determination.
+- Compliance trace — Consumer Protection Act 2019 / IT (Intermediary) Rules 2021 (India): not triggered, since AC-022 confirms no payments, accounts, or user-generated content hosting occur.
 
 **Related:** US-010, US-011, AC-021, AC-022, AC-023, AC-024, NFR-004, NFR-009
 
-- ⚠ The no-personal-data/no-consent-duties position is explicitly called out in AC-024 as an assumption needing confirmation by a human reviewer -- not yet signed off.
-- ⚠ Education domain skill flags age-appropriate design codes and verifiable parental consent for minors; since the calculator may be used by school-age students, the project should explicitly confirm no age-gating or parental consent is needed given the no-data-collection design.
-- ⚠ No mention of analytics, crash reporting, or third-party scripts (e.g., CDN telemetry) that could inadvertently collect data -- not addressed by any requirement.
+- ⚠ The no-personal-data / DPDP-out-of-scope position (AC-024) is explicitly flagged in the requirements as an assumption still to be confirmed — not yet signed off by a human or legal reviewer.
+- ⚠ No information is given on user ages (e.g., whether under-18 learners could access this public tool), which the Education domain skill calls out as needed to assess DPDP verifiable-parental-consent applicability.
 
-### EPIC-006 · approved · source: requirements:EPIC-006
+### EPIC-006 · draft · source: requirements:EPIC-006
 
-Optional calculation history, kept only in the browser for the current session and clearable by the user.
+Optional calculation history, kept entirely client-side and never persisted server-side.
 
-US-012 (low): when history is enabled, completed calculations appear in a client-side list (AC-025); history is kept client-side only and never transmitted/persisted on a server (AC-026); user can clear the history list, removing entries from the browser (AC-027). Compliance: aligns with NFR-005 (history kept only in the browser) and reinforces the no-personal-data position used to keep DPDP/CERT-In duties out of scope.
+- US-012 (low): completed calculations appear in a client-side, in-session history list (AC-025); history is kept client-side only and never transmitted to or persisted on a server (AC-026); the user can clear the history, removing entries from the browser (AC-027).
 
 **Related:** US-012, AC-025, AC-026, AC-027, NFR-005
 
-- ⚠ History is described as 'optional' but no requirement specifies how a user enables/disables it or whether it is on by default.
+### EPIC-007 · draft · source: requirements:EPIC-007
 
-### EPIC-007 · approved · source: requirements:EPIC-007
+WCAG 2.1 AA conformance, aligned with India's RPwD Act 2016 and GIGW guidance, is treated as a mandatory pre-release gate.
 
-WCAG 2.1 AA accessibility, aligned with India's RPwD Act 2016 and GIGW guidance, treated as a mandatory release gate.
-
-US-013 (critical): every control is keyboard-reachable with a visible focus indicator and keyboard-activatable (AC-028); screen readers get an accessible name/label for every control and the result display, and results are announced (AC-029). US-014 (high): release candidates are evaluated against WCAG 2.1 AA (contrast, focus order, labels, keyboard operability) and release is blocked until failures are resolved (AC-030); colour contrast meets WCAG 2.1 AA minimums and state is never conveyed by colour alone (AC-031). Compliance: Rights of Persons with Disabilities Act 2016 (India) and GIGW guidelines, aligned with WCAG 2.1 AA -- accessibility release gate; NFR-006 makes this a hard gate rather than a best-effort goal.
+- US-013 (critical): every control is reachable and activatable by keyboard alone with a visible focus indicator (AC-028); every control and the result display has an accessible name/label and the current result is announced to screen readers (AC-029).
+- US-014 (high): a release candidate is evaluated against WCAG 2.1 AA (colour contrast, focus order, labels, keyboard operability) and release is blocked until failures are resolved (AC-030); colour-conveyed state (active/error/focus) must also meet AA contrast minimums and not rely on colour alone (AC-031).
+- Compliance trace — RPwD Act 2016 (India) and GIGW guidelines: WCAG 2.1 AA conformance is explicitly adopted as the release gate to align with these per the epic's stated assumption.
 
 **Related:** US-013, US-014, AC-028, AC-029, AC-030, AC-031, NFR-006
 
-- ⚠ No testing-phase evidence yet exists that WCAG 2.1 AA conformance has actually been evaluated or passed -- the release gate defined here cannot currently be confirmed as met.
+### REQ-NFR-SET · draft · source: requirements:non-functional-requirements
 
-### REQ-NFR-003 · approved · source: requirements:NFR-003
+Nine cross-cutting non-functional requirements span performance, scalability, privacy, accessibility, usability and compatibility.
 
-System-wide requirement to stay available and responsive during term-start registration and exam-week traffic peaks.
+- NFR-001 (performance): fast load on low-bandwidth connections (applies US-009).
+- NFR-002 (performance): all calculations run client-side after load, no further network requests (US-009, US-010).
+- NFR-003 (scalability): stay available through term-start/exam peaks, supported by a health/status endpoint (whole system).
+- NFR-004 (privacy): no personal data collected/transmitted/stored (US-011).
+- NFR-005 (privacy): history kept client-side only, never persisted server-side (US-012).
+- NFR-006 (accessibility): WCAG 2.1 AA as a release gate, incl. keyboard operability, focus indicators, screen-reader labels/announcements, colour contrast (US-013, US-014).
+- NFR-007 (usability): responsive layout across mobile/desktop screen sizes (US-008).
+- NFR-008 (compatibility): runs in mobile/desktop/low-bandwidth web browsers; no native/installable app (US-008, US-009).
+- NFR-009 (compliance, accepted risk): no-personal-data position documented so DPDP/parental-consent/CERT-In data duties remain out of material scope, assumption to be confirmed (US-011).
 
-NFR-003 (scalability, applies to whole system): the service must stay up and serve the app reliably during registration and exam-week peaks, supported by a simple health/status endpoint on the FastAPI server. Compliance: Higher-Education typical non-functional requirement -- 'scaling for term-start and exam peaks' / 'load peaks at registration, results day and exam windows'.
+**Related:** NFR-001, NFR-002, NFR-003, NFR-004, NFR-005, NFR-006, NFR-007, NFR-008, NFR-009, US-008, US-009, US-010, US-011, US-012, US-013, US-014
 
-**Related:** REQ-STACK
-
-- ⚠ No architecture or capacity-planning detail (e.g., autoscaling rules, CDN caching strategy, expected concurrent-user targets) has been provided to show how this requirement will actually be met.
+- ⚠ NFR-003 (availability during peaks) has no load-testing evidence in the testing phase input.
+- ⚠ NFR-009 is explicitly labelled an accepted-risk assumption pending confirmation against the DPDP Act.
 <!-- sdlc:auto:end narrative -->
 
 <!-- sdlc:auto:start summary -->

@@ -3,119 +3,87 @@
 > Maintained by QuorQ AI SDLC. Text between `sdlc:auto` markers is regenerated; anything outside them is yours and is kept.
 
 <!-- sdlc:auto:start narrative -->
-### PLAN-001 · approved · source: plan:v1
+### DEV-PLAN-SPRINT-1 · approved · source: plan:Sprint 1
 
-Development plan version 1 is approved and organizes work into 3 sprints covering core arithmetic, input methods/delivery, and accessibility.
+Sprint 1 goal: core arithmetic engine (entry, four operations, running result, clear/all-clear, percentage) plus anonymous-access baseline and privacy documentation. Capacity 20 points.
 
-Plan status: approved, version 1. Sprint 1 goal: core arithmetic engine (number entry, four operations, running result, clear/all-clear, percentage) plus no-login/no-personal-data baseline, capacity 20. Sprint 2 goal: input methods (on-screen buttons, keyboard), responsive/low-bandwidth delivery, optional client-side history, capacity 20. Sprint 3 goal: WCAG 2.1 AA accessibility implementation and release-gate audit, capacity 20.
+Items: US-001 (3 pts, frontend-agent), US-002 (5 pts, frontend-agent), US-003 (3 pts, frontend-agent), US-004 (2 pts, frontend-agent), US-005 (3 pts, frontend-agent), US-010 (1 pt, frontend-agent), US-011 (2 pts, security-agent) — 19 of 20 capacity points planned. All seven items match the tickets later marked delivered.
 
-**Related:** US-001, US-002, US-003, US-004, US-005, US-006, US-007, US-008, US-009, US-010, US-011, US-012, US-013, US-014
+**Related:** EPIC-001, EPIC-002, EPIC-005, US-001, US-002, US-003, US-004, US-005, US-010, US-011
 
-- ⚠ Backlog items are not explicitly mapped to individual sprints in the input -- only sprint-level goals and item-level epic groupings are given; which specific stories/tasks landed in which sprint is not confirmed.
-- ⚠ No actual development progress (commits, PRs, build status) or ticket completion state was provided for this phase -- only planned backlog content exists.
+### DEV-PLAN-SPRINT-2 · draft · source: plan:Sprint 2
 
-### SPRINT-1 · approved · source: plan:Sprint 1
+Sprint 2 goal: on-screen and keyboard input wired to the engine, responsive layout, and low-bandwidth load performance. Capacity 20 points.
 
-Sprint 1 targets the core arithmetic engine and the anonymous/no-data baseline.
+Items: US-006 (5 pts, frontend-agent), US-007 (3 pts, frontend-agent), US-008 (5 pts, frontend-agent), US-009 (3 pts, frontend-agent) — 16 of 20 capacity points planned.
 
-Goal: Core arithmetic engine: number entry, four operations, running result, clear/all-clear, percentage, plus no-login and no-personal-data baseline. Capacity: 20 points.
+**Related:** EPIC-003, EPIC-004, US-006, US-007, US-008, US-009
 
-**Related:** US-001, US-002, US-003, US-004, US-005, US-010, US-011
+- ⚠ No delivery ticket or commit for US-006, US-007, US-008 or US-009 appears in the development run status, even though the overall development run is marked 'completed' — confirm whether Sprint 2 work actually shipped.
 
-- ⚠ No confirmation of which backlog items were actually completed within this sprint.
+### DEV-PLAN-SPRINT-3 · draft · source: plan:Sprint 3
 
-### SPRINT-2 · approved · source: plan:Sprint 2
+Sprint 3 goal: optional client-side history and WCAG 2.1 AA accessibility conformance as the release gate. Capacity 20 points.
 
-Sprint 2 targets input methods, responsive/low-bandwidth delivery, and optional history.
+Items: US-012 (5 pts, frontend-agent); US-013 (8 pts, frontend-agent) with tasks US-013-T1 (ARIA labels/roles on all controls and result display), US-013-T2 (keyboard focus order and visible focus indicators), US-013-T3 (live-region announcements for result updates), US-013-T4 (automated keyboard/screen-reader accessibility test suite, qa-agent); US-014 (3 pts, qa-agent) — 16 of 20 capacity points planned.
 
-Goal: Input methods (on-screen buttons, keyboard), responsive/low-bandwidth delivery, and optional client-side history. Capacity: 20 points.
+**Related:** EPIC-006, EPIC-007, US-012, US-013, US-013-T1, US-013-T2, US-013-T3, US-013-T4, US-014
 
-**Related:** US-006, US-007, US-008, US-009, US-012
+- ⚠ No delivery ticket or commit for US-012, US-013 (or tasks T1–T4), or US-014 appears in the development run status, despite the run being marked 'completed' — confirm whether the history feature and the WCAG 2.1 AA release-gate work actually shipped before relying on it.
 
-- ⚠ No confirmation of which backlog items were actually completed within this sprint.
+### DEV-TICKET-US-001 · approved · source: dev:US-001
 
-### SPRINT-3 · approved · source: plan:Sprint 3
+Ticket for 'Enter numbers including decimals' delivered.
 
-Sprint 3 targets WCAG 2.1 AA accessibility implementation and the release-gate audit.
+Status: delivered. Commit 49e68fdaae738f57a26c099408acbfc5e60ec38b (shared commit covering US-001 through US-005).
 
-Goal: WCAG 2.1 AA accessibility implementation and release-gate audit. Capacity: 20 points.
+**Related:** US-001, EPIC-001
 
-**Related:** US-013, US-014
+### DEV-TICKET-US-002 · approved · source: dev:US-002
 
-- ⚠ No confirmation of which backlog items were actually completed within this sprint.
-- ⚠ No audit results or release-gate decision provided yet.
+Ticket for 'Perform addition, subtraction, multiplication and division' delivered.
 
-### EPIC-001 · draft · source: plan:EPIC-001
+Status: delivered. Commit 49e68fdaae738f57a26c099408acbfc5e60ec38b (shared commit covering US-001 through US-005).
 
-Core Arithmetic Calculation epic covers number entry, the four basic operations, running result display, and clear/all-clear controls.
+**Related:** US-002, EPIC-001
 
-Epic EPIC-001 (role unassigned at epic level) groups: US-001 Enter numbers including decimals (3 pts, frontend-agent); US-002 Perform addition, subtraction, multiplication and division (5 pts, frontend-agent); US-003 View a running result (3 pts, frontend-agent); US-004 Clear and all-clear controls (2 pts, frontend-agent).
+### DEV-TICKET-US-003 · approved · source: dev:US-003
 
-**Related:** US-001, US-002, US-003, US-004
+Ticket for 'View a running result' delivered.
 
-- ⚠ No implementation or completion status reported for any of these stories.
+Status: delivered. Commit 49e68fdaae738f57a26c099408acbfc5e60ec38b (shared commit covering US-001 through US-005).
 
-### EPIC-002 · draft · source: plan:EPIC-002
+**Related:** US-003, EPIC-001
 
-Percentage Calculation epic covers computing a percentage value.
+### DEV-TICKET-US-004 · approved · source: dev:US-004
 
-Epic EPIC-002 (role unassigned at epic level) groups: US-005 Calculate a percentage (3 pts, frontend-agent).
+Ticket for 'Clear and all-clear controls' delivered.
 
-**Related:** US-005
+Status: delivered. Commit 49e68fdaae738f57a26c099408acbfc5e60ec38b (shared commit covering US-001 through US-005).
 
-- ⚠ No implementation or completion status reported for this story.
+**Related:** US-004, EPIC-001
 
-### EPIC-003 · draft · source: plan:EPIC-003
+### DEV-TICKET-US-005 · approved · source: dev:US-005
 
-Input Methods epic covers operating the calculator via on-screen buttons and via keyboard.
+Ticket for 'Calculate a percentage' delivered.
 
-Epic EPIC-003 (role unassigned at epic level) groups: US-006 Operate the calculator with on-screen buttons (5 pts, frontend-agent); US-007 Operate the calculator with the keyboard (3 pts, frontend-agent).
+Status: delivered. Commit 49e68fdaae738f57a26c099408acbfc5e60ec38b (shared commit covering US-001 through US-005).
 
-**Related:** US-006, US-007
+**Related:** US-005, EPIC-002
 
-- ⚠ No implementation or completion status reported for these stories.
+### DEV-TICKET-US-010 · approved · source: dev:US-010
 
-### EPIC-004 · draft · source: plan:EPIC-004
+Ticket for 'Use the calculator without login or accounts' delivered.
 
-Responsive, Low-Bandwidth Web Delivery epic covers cross-device layout and performance on constrained connections.
+Status: delivered. Commit d3ca62706328b4172bc1afcbc1250c962b35a99f.
 
-Epic EPIC-004 (role unassigned at epic level) groups: US-008 Use the calculator on mobile and desktop screens (3 pts, frontend-agent); US-009 Work on low-bandwidth connections (2 pts, frontend-agent).
+**Related:** US-010, EPIC-005
 
-**Related:** US-008, US-009
+### DEV-TICKET-US-011 · approved · source: dev:US-011
 
-- ⚠ No implementation or completion status reported for these stories.
-- ⚠ No performance/bandwidth test data provided to confirm the low-bandwidth requirement is met.
+Ticket for 'No personal data collected or stored' delivered.
 
-### EPIC-005 · draft · source: plan:EPIC-005
+Status: delivered. Commit d3ca62706328b4172bc1afcbc1250c962b35a99f.
 
-Anonymous Public Access and Privacy epic covers login-free use and avoidance of personal data collection.
-
-Epic EPIC-005 (role unassigned at epic level) groups: US-010 Use the calculator without login or accounts (1 pt, frontend-agent); US-011 No personal data collected or stored (2 pts, security-agent).
-
-**Related:** US-010, US-011
-
-- ⚠ No implementation or completion status reported for these stories.
-- ⚠ No security-agent verification/report provided confirming no personal data is collected or stored.
-
-### EPIC-006 · draft · source: plan:EPIC-006
-
-Optional Client-Side Calculation History epic covers viewing recent calculations in the browser.
-
-Epic EPIC-006 (role unassigned at epic level) groups: US-012 View recent calculations in the browser (5 pts, frontend-agent).
-
-**Related:** US-012
-
-- ⚠ No implementation or completion status reported for this story.
-- ⚠ Not stated whether history persists across sessions or is purely in-memory/client-side only.
-
-### EPIC-007 · draft · source: plan:EPIC-007
-
-Accessibility epic establishes WCAG 2.1 AA conformance as a release gate, covering keyboard/assistive-technology operability.
-
-Epic EPIC-007 (role unassigned at epic level) groups: US-013 Fully operable by keyboard and assistive technology (8 pts, frontend-agent), broken into US-013-T1 Add ARIA labels and roles to all calculator buttons and the display (frontend-agent), US-013-T2 Implement keyboard focus management and visible focus indicators (frontend-agent), US-013-T3 Add aria-live region to announce result changes (frontend-agent), US-013-T4 Write automated accessibility and keyboard-navigation test suite (qa-agent); and US-014 Accessibility conformance as a release gate (3 pts, qa-agent).
-
-**Related:** US-013, US-013-T1, US-013-T2, US-013-T3, US-013-T4, US-014
-
-- ⚠ No implementation or completion status reported for the story or its subtasks.
-- ⚠ No audit/test results provided yet to confirm WCAG 2.1 AA conformance or to support the release-gate decision for US-014.
+**Related:** US-011, EPIC-005
 <!-- sdlc:auto:end narrative -->
