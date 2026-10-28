@@ -18,7 +18,8 @@ async function press(page: Page, key: keyof typeof KEY) {
 }
 
 const LOGIN_PATTERN = /log\s*in|log\s*out|sign\s*in|sign\s*up|register|account|password|username/i;
-const PAYMENT_PATTERN = /pay(ment)?|subscri(be|ption)|billing|checkout|credit card|invoice|price|\$\d/i;
+const PAYMENT_PATTERN =
+  /pay(ment)?|subscri(be|ption)|billing|checkout|credit card|invoice|price|\$\d/i;
 
 test.describe("US-010-2 calculator — no login, no payment, browser-only", () => {
   test("[AC-021] loading the calculator shows a usable keypad with no login, registration or account prompt", async ({
