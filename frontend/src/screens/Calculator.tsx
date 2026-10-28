@@ -1,45 +1,46 @@
-// @ts-nocheck -- generated from the approved design under its JS runtime contract; not hand-written TypeScript.
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 
 import * as UI from "@/lib/ui";
 import { Icons } from "@/lib/icons";
 import { brand } from "@/lib/brand";
 import { useNavigate } from "@/lib/navigate";
+import {
+  press as pressKey,
+  formatDisplay,
+  initialState,
+  DIVIDE_BY_ZERO_MESSAGE,
+  type CalcState,
+  type Key,
+  type Operator,
+} from "@/lib/calc";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { Empty } = UI;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { Check, X, Trash, ArrowRight, AlertCircle } = Icons;
+
+const { Check, Trash, ArrowRight, AlertCircle } = Icons;
 
 const PRODUCT = "calculator";
 const SCREEN = "Calculator";
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
-const SEED_HISTORY = [
-  { id: 4, expr: "7 × 8", result: "56" },
-  { id: 3, expr: "120 ÷ 4", result: "30" },
-  { id: 2, expr: "240 × 50%", result: "120" },
-  { id: 1, expr: "12.75 + 3.5", result: "16.25" },
-];
+interface HistoryEntry {
+  id: number;
+  expr: string;
+  result: string;
+}
 
-const OPS = {
-  "+": (a, b) => a + b,
-  "−": (a, b) => a - b,
-  "×": (a, b) => a * b,
-  "÷": (a, b) => a / b,
+const DISPLAY_OP: Record<Operator, string> = { "+": "+", "-": "−", "*": "×", "/": "÷" };
+const OP_NAMES: Record<Operator, string> = {
+  "+": "Add",
+  "-": "Subtract",
+  "*": "Multiply",
+  "/": "Divide",
 };
 
-const OP_NAMES = { "+": "Add", "−": "Subtract", "×": "Multiply", "÷": "Divide" };
+const isDigitKey = (key: string): boolean => /^[0-9]$/.test(key);
+const isOperatorKey = (key: string): key is Operator =>
+  key === "+" || key === "-" || key === "*" || key === "/";
 
-const fmtNum = (n) => {
-  if (!isFinite(n) || isNaN(n)) return "0";
-  const r = parseFloat(n.toPrecision(12));
-  if (r !== 0 && (Math.abs(r) >= 1e12 || Math.abs(r) < 1e-9)) return r.toExponential(6);
-  return String(r);
-};
-
-const group = (s) => {
+const group = (s: string): string => {
   if (s === "" || /e/i.test(s)) return s;
   const neg = s.charAt(0) === "-";
   const body = neg ? s.slice(1) : s;
@@ -49,7 +50,29 @@ const group = (s) => {
   return (neg ? "-" : "") + int.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + rest;
 };
 
-const KeyBtn = ({ wf, label, aria, onPress, variant = "digit", span, pressed, disabled }) => {
+type Variant = "digit" | "op" | "equals" | "util";
+
+interface KeyBtnProps {
+  wf: string;
+  label: string;
+  aria?: string;
+  onPress: () => void;
+  variant?: Variant;
+  span?: string;
+  pressed?: boolean;
+  disabled?: boolean;
+}
+
+const KeyBtn = ({
+  wf,
+  label,
+  aria,
+  onPress,
+  variant = "digit",
+  span,
+  pressed,
+  disabled,
+}: KeyBtnProps) => {
   const ink = brand.primaryColor;
   const paper = brand.backgroundColor;
   const accent = brand.accentColor;
@@ -66,7 +89,7 @@ const KeyBtn = ({ wf, label, aria, onPress, variant = "digit", span, pressed, di
       disabled={disabled}
       onClick={onPress}
       className={
-        span +
+        (span ?? "col-span-3 lg:col-span-2") +
         " wf-key flex items-center justify-center font-bold min-h-[60px] lg:min-h-[78px] " +
         "transition-transform duration-100 hover:-translate-x-[1px] hover:-translate-y-[1px] " +
         "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] " +
@@ -99,26 +122,21 @@ export default function Screen() {
   const muted = brand.neutralColor;
   const thick = `3px solid ${ink}`;
 
-  const [calc, setCalc] = React.useState({
-    entry: "1234.56",
-    acc: null,
-    op: null,
-    overwrite: true,
-    tape: "120 ÷ 4 =",
-    error: null,
-    label: null,
-  });
-  const [history, setHistory] = React.useState(SEED_HISTORY);
+  const [calc, setCalc] = React.useState<CalcState>(initialState);
+  const [tape, setTape] = React.useState<string>("");
+  const [label, setLabel] = React.useState<string | null>(null);
+  const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [cleared, setCleared] = React.useState(false);
   const [confirmClear, setConfirmClear] = React.useState(false);
-  const [flash, setFlash] = React.useState(null);
+  const [flash, setFlash] = React.useState<Key | null>(null);
 
   const calcRef = React.useRef(calc);
   calcRef.current = calc;
+  const labelRef = React.useRef(label);
+  labelRef.current = label;
   const confirmRef = React.useRef(confirmClear);
   confirmRef.current = confirmClear;
-  const idRef = React.useRef(100);
-  const flashRef = React.useRef(0);
+  const idRef = React.useRef(0);
 
   React.useEffect(() => {
     if (!flash) return undefined;
@@ -126,98 +144,92 @@ export default function Screen() {
     return () => clearTimeout(t);
   }, [flash]);
 
-  const commit = (next) => {
+  const commit = (next: CalcState) => {
     calcRef.current = next;
     setCalc(next);
   };
 
-  const pushHistory = (expr, result) => {
+  const pushHistory = (expr: string, result: string) => {
     idRef.current += 1;
     const id = idRef.current;
     setHistory((h) => [{ id, expr, result }, ...h].slice(0, 20));
     setCleared(false);
   };
 
-  const act = (key) => {
+  const act = (key: Key) => {
     const c = calcRef.current;
 
     if (key === "AC") {
-      return commit({ entry: "0", acc: null, op: null, overwrite: true, tape: "", error: null, label: null });
+      commit(pressKey(c, key));
+      setTape("");
+      setLabel(null);
+      return;
     }
-    if (key === "C") {
-      return commit({ ...c, entry: "0", overwrite: true, error: null, label: null });
-    }
-    if (c.error) return undefined;
 
-    if (/^[0-9]$/.test(key)) {
-      const base = c.overwrite || c.entry === "0" ? "" : c.entry;
-      if (base.replace(/[-.]/g, "").length >= 12) return undefined;
-      return commit({ ...c, entry: base + key, overwrite: false, label: null });
+    if (key === "C") {
+      commit(pressKey(c, key));
+      setLabel(null);
+      return;
     }
-    if (key === ".") {
-      if (c.overwrite) return commit({ ...c, entry: "0.", overwrite: false, label: null });
-      if (c.entry.indexOf(".") !== -1) return undefined;
-      return commit({ ...c, entry: c.entry + ".", label: null });
+
+    if (c.error) return;
+
+    if (isDigitKey(key) || key === ".") {
+      commit(pressKey(c, key));
+      setLabel(null);
+      return;
     }
+
     if (key === "%") {
-      const n = Number(c.entry) || 0;
       const mark = group(c.entry) + "%";
-      if (c.acc !== null && c.op) {
-        return commit({ ...c, entry: fmtNum((c.acc * n) / 100), overwrite: false, label: mark });
-      }
-      return commit({ ...c, entry: fmtNum(n / 100), overwrite: false, label: mark });
+      commit(pressKey(c, key));
+      setLabel(mark);
+      return;
     }
-    if (OPS[key]) {
-      const n = Number(c.entry) || 0;
-      if (c.acc !== null && c.op && !c.overwrite) {
-        if (c.op === "÷" && n === 0) {
-          return commit({ ...c, error: "divzero", tape: `${group(fmtNum(c.acc))} ÷ ${group(c.entry)} =` });
-        }
-        const value = OPS[c.op](c.acc, n);
-        return commit({
-          entry: fmtNum(value),
-          acc: value,
-          op: key,
-          overwrite: true,
-          tape: `${group(fmtNum(value))} ${key}`,
-          error: null,
-          label: null,
-        });
+
+    if (isOperatorKey(key)) {
+      const next = pressKey(c, key);
+      if (next.error) {
+        setTape(
+          `${group(c.accumulator ?? "")} ${c.operator ? DISPLAY_OP[c.operator] : ""} ${group(c.entry)} =`,
+        );
+        commit(next);
+        return;
       }
-      return commit({ ...c, acc: n, op: key, overwrite: true, tape: `${group(fmtNum(n))} ${key}`, label: null });
+      commit(next);
+      setTape(`${group(next.accumulator ?? "")} ${DISPLAY_OP[key]}`);
+      setLabel(null);
+      return;
     }
+
     if (key === "=") {
-      const n = Number(c.entry) || 0;
-      if (c.acc === null || !c.op) {
-        return commit({ ...c, tape: `${group(fmtNum(n))} =`, overwrite: true });
+      if (c.operator === null || c.accumulator === null) {
+        commit(pressKey(c, key));
+        setTape(`${group(c.entry)} =`);
+        return;
       }
-      if (c.op === "÷" && n === 0) {
-        return commit({ ...c, error: "divzero", tape: `${group(fmtNum(c.acc))} ÷ ${group(c.entry)} =` });
+      const next = pressKey(c, key);
+      if (next.error) {
+        setTape(`${group(c.accumulator)} ${DISPLAY_OP[c.operator]} ${group(c.entry)} =`);
+        commit(next);
+        return;
       }
-      const value = OPS[c.op](c.acc, n);
-      const expr = `${group(fmtNum(c.acc))} ${c.op} ${c.label || group(c.entry)}`;
-      pushHistory(expr, group(fmtNum(value)));
-      return commit({
-        entry: fmtNum(value),
-        acc: null,
-        op: null,
-        overwrite: true,
-        tape: `${expr} =`,
-        error: null,
-        label: null,
-      });
+      const expr = `${group(c.accumulator)} ${DISPLAY_OP[c.operator]} ${labelRef.current || group(c.entry)}`;
+      pushHistory(expr, group(next.entry));
+      commit(next);
+      setTape(`${expr} =`);
+      setLabel(null);
+      return;
     }
-    return undefined;
   };
 
-  const press = (key) => {
-    flashRef.current += 1;
-    setFlash({ key, n: flashRef.current });
+  const press = (key: Key) => {
+    setFlash(key);
     act(key);
   };
 
   React.useEffect(() => {
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key;
       if (k === "Escape" && confirmRef.current) {
@@ -225,38 +237,50 @@ export default function Screen() {
         setConfirmClear(false);
         return;
       }
-      let mapped = null;
-      if (/^[0-9]$/.test(k)) mapped = k;
+      let mapped: Key | null = null;
+      if (/^[0-9]$/.test(k)) mapped = k as Key;
       else if (k === "." || k === ",") mapped = ".";
       else if (k === "+") mapped = "+";
-      else if (k === "-") mapped = "−";
-      else if (k === "*" || k === "x" || k === "X") mapped = "×";
-      else if (k === "/") mapped = "÷";
+      else if (k === "-") mapped = "-";
+      else if (k === "*" || k === "x" || k === "X") mapped = "*";
+      else if (k === "/") mapped = "/";
       else if (k === "%") mapped = "%";
       else if (k === "Enter" || k === "=") mapped = "=";
       else if (k === "Escape") mapped = "C";
       else if (k === "Delete") mapped = "AC";
       if (!mapped) return;
-      const t = e.target;
+      const t = e.target as HTMLElement | null;
       if (k === "Enter" && t && (t.tagName === "BUTTON" || t.tagName === "A")) return;
       e.preventDefault();
       press(mapped);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const pressedKey = flash ? flash.key : null;
-  const isDiv0 = calc.error === "divzero";
+  const pressedKey = flash;
+  const isDiv0 = calc.error === DIVIDE_BY_ZERO_MESSAGE;
   const locked = isDiv0;
   const shown = group(calc.entry);
+  const displayed = calc.error ?? shown;
 
-  const keyProps = (key, opts) => ({
+  const keyProps = (
+    key: Key,
+    opts: {
+      wf: string;
+      label?: string;
+      aria?: string;
+      variant?: Variant;
+      span?: string;
+      disabled?: boolean;
+    },
+  ): KeyBtnProps => ({
     wf: opts.wf,
     label: opts.label || key,
     aria: opts.aria,
     variant: opts.variant,
-    span: opts.span || "col-span-3 lg:col-span-2",
+    span: opts.span,
     pressed: pressedKey === key,
     disabled: opts.disabled,
     onPress: () => press(key),
@@ -264,14 +288,14 @@ export default function Screen() {
 
   const sideNote = "col-span-12 lg:col-span-4 flex flex-col justify-center py-2 pl-4";
   const noteStyle = { borderLeft: thick, fontFamily: MONO };
-  const label = "text-[11px] uppercase tracking-[0.18em]";
+  const labelClass = "text-[11px] uppercase tracking-[0.18em]";
 
   return (
     <div
       style={{
         color: ink,
         fontFamily: brand.fontBody,
-        ["--wf-accent"]: accent,
+        ["--wf-accent" as string]: accent,
       }}
     >
       <style>{`
@@ -291,10 +315,13 @@ export default function Screen() {
           style={{ borderBottom: thick }}
         >
           <div>
-            <p className={label} style={{ fontFamily: MONO }}>
+            <p className={labelClass} style={{ fontFamily: MONO }}>
               {PRODUCT} / Keypad · no account · runs in your browser
             </p>
-            <h1 className="mt-2 text-6xl sm:text-7xl font-bold leading-none tracking-tight" style={{ fontFamily: brand.fontHeading }}>
+            <h1
+              className="mt-2 text-6xl sm:text-7xl font-bold leading-none tracking-tight"
+              style={{ fontFamily: brand.fontHeading }}
+            >
               {SCREEN}
             </h1>
           </div>
@@ -305,7 +332,7 @@ export default function Screen() {
             >
               {String(history.length).padStart(2, "0")}
             </span>
-            <span className={label}>in this session</span>
+            <span className={labelClass}>in this session</span>
           </p>
         </header>
 
@@ -313,16 +340,21 @@ export default function Screen() {
         <section
           data-wf="b-1-0"
           className="col-span-12 lg:col-span-8 p-5 lg:p-7"
-          style={{ border: thick, borderRadius: brand.radius, backgroundColor: paper, boxShadow: `6px 6px 0 ${isDiv0 ? accent : ink}` }}
+          style={{
+            border: thick,
+            borderRadius: brand.radius,
+            backgroundColor: paper,
+            boxShadow: `6px 6px 0 ${isDiv0 ? accent : ink}`,
+          }}
         >
           <div className="flex items-center justify-between gap-3" style={{ fontFamily: MONO }}>
-            <span className={label}>Display</span>
-            <span className={label} style={{ color: muted }}>
+            <span className={labelClass}>Display</span>
+            <span className={labelClass} style={{ color: muted }}>
               {isDiv0
                 ? "Error held"
-                : calc.op
-                ? `Operator ${calc.op} held — ${OP_NAMES[calc.op]}`
-                : "Ready"}
+                : calc.operator
+                  ? `Operator ${DISPLAY_OP[calc.operator]} held — ${OP_NAMES[calc.operator]}`
+                  : "Ready"}
             </span>
           </div>
           <output
@@ -336,7 +368,7 @@ export default function Screen() {
               color: isDiv0 ? accent : ink,
             }}
           >
-            {isDiv0 ? "Cannot divide by zero" : shown}
+            {isDiv0 ? formatDisplay(calc) : displayed}
           </output>
           <p className="mt-4 text-[11px]" style={{ fontFamily: MONO, color: muted }}>
             {isDiv0
@@ -346,7 +378,7 @@ export default function Screen() {
         </section>
 
         <p data-wf="b-1-1" className={sideNote} style={noteStyle}>
-          <span className={label} style={{ color: muted }}>
+          <span className={labelClass} style={{ color: muted }}>
             Privacy
           </span>
           <span className="mt-2 text-sm leading-relaxed">
@@ -358,20 +390,32 @@ export default function Screen() {
         <section
           data-wf="b-2-0"
           className="col-span-12 lg:col-span-8 flex h-full flex-col justify-between p-5 lg:p-6"
-          style={{ border: thick, borderRadius: brand.radius, backgroundColor: paper, boxShadow: `6px 6px 0 ${ink}` }}
+          style={{
+            border: thick,
+            borderRadius: brand.radius,
+            backgroundColor: paper,
+            boxShadow: `6px 6px 0 ${ink}`,
+          }}
         >
-          <h2 className={label} style={{ fontFamily: MONO }}>
+          <h2 className={labelClass} style={{ fontFamily: MONO }}>
             01 / Running tape
           </h2>
           <p
             className="mt-4 overflow-x-auto whitespace-nowrap text-2xl sm:text-3xl font-bold"
-            style={{ fontFamily: MONO, fontVariantNumeric: "tabular-nums", color: calc.tape ? ink : muted }}
+            style={{
+              fontFamily: MONO,
+              fontVariantNumeric: "tabular-nums",
+              color: tape ? ink : muted,
+            }}
           >
-            {calc.tape || "Nothing on the tape — press a digit to start."}
+            {tape || "Nothing on the tape — press a digit to start."}
           </p>
-          <p className="mt-4 text-[11px] leading-relaxed" style={{ fontFamily: MONO, color: muted }}>
-            Chain as long as you like: each result carries straight into the next operator. Press = again to hold the
-            running result.
+          <p
+            className="mt-4 text-[11px] leading-relaxed"
+            style={{ fontFamily: MONO, color: muted }}
+          >
+            Chain as long as you like: each result carries straight into the next operator. Press =
+            again to hold the running result.
           </p>
         </section>
 
@@ -410,7 +454,8 @@ export default function Screen() {
                     </span>
                     <span className="text-sm">
                       {h.expr} <span aria-hidden="true">=</span>
-                      <span className="sr-only">equals</span> <strong className="font-bold">{h.result}</strong>
+                      <span className="sr-only">equals</span>{" "}
+                      <strong className="font-bold">{h.result}</strong>
                     </span>
                   </li>
                 ))}
@@ -422,16 +467,39 @@ export default function Screen() {
         <h2 className="sr-only">Keypad</h2>
 
         {/* ROW 4 */}
-        <KeyBtn {...keyProps("AC", { wf: "b-3-0", aria: "All clear — reset the whole calculation", variant: "util" })} />
-        <KeyBtn {...keyProps("C", { wf: "b-3-1", aria: "Clear the current entry", variant: "util" })} />
-        <KeyBtn {...keyProps("%", { wf: "b-3-2", aria: "Percentage", variant: "util", disabled: locked })} />
-        <KeyBtn {...keyProps("÷", { wf: "b-3-3", aria: "Divide", variant: "op", disabled: locked })} />
+        <KeyBtn
+          {...keyProps("AC", {
+            wf: "b-3-0",
+            aria: "All clear — reset the whole calculation",
+            variant: "util",
+          })}
+        />
+        <KeyBtn
+          {...keyProps("C", { wf: "b-3-1", aria: "Clear the current entry", variant: "util" })}
+        />
+        <KeyBtn
+          {...keyProps("%", { wf: "b-3-2", aria: "Percentage", variant: "util", disabled: locked })}
+        />
+        <KeyBtn
+          {...keyProps("/", {
+            wf: "b-3-3",
+            aria: "Divide",
+            variant: "op",
+            label: "÷",
+            disabled: locked,
+          })}
+        />
 
         <div className="col-span-12 lg:col-span-4 flex flex-col justify-center gap-2">
           {confirmClear ? (
             <div
               className="flex flex-wrap items-center gap-3 p-3"
-              style={{ border: thick, borderRadius: brand.radius, boxShadow: `4px 4px 0 ${accent}`, fontFamily: MONO }}
+              style={{
+                border: thick,
+                borderRadius: brand.radius,
+                boxShadow: `4px 4px 0 ${accent}`,
+                fontFamily: MONO,
+              }}
             >
               <span className="text-[11px] uppercase tracking-[0.18em]">
                 Delete {history.length} {history.length === 1 ? "entry" : "entries"}?
@@ -476,8 +544,8 @@ export default function Screen() {
             {confirmClear
               ? "Press Esc to keep them."
               : history.length === 0
-              ? "Nothing stored in this browser right now."
-              : "Removes the list from this browser."}
+                ? "Nothing stored in this browser right now."
+                : "Removes the list from this browser."}
           </p>
         </div>
 
@@ -485,7 +553,15 @@ export default function Screen() {
         <KeyBtn {...keyProps("7", { wf: "b-4-0", disabled: locked })} />
         <KeyBtn {...keyProps("8", { wf: "b-4-1", disabled: locked })} />
         <KeyBtn {...keyProps("9", { wf: "b-4-2", disabled: locked })} />
-        <KeyBtn {...keyProps("×", { wf: "b-4-3", aria: "Multiply", variant: "op", disabled: locked })} />
+        <KeyBtn
+          {...keyProps("*", {
+            wf: "b-4-3",
+            aria: "Multiply",
+            variant: "op",
+            label: "×",
+            disabled: locked,
+          })}
+        />
 
         <div
           data-wf="b-4-4"
@@ -500,11 +576,13 @@ export default function Screen() {
             fontFamily: MONO,
           }}
         >
-          <span className={label} style={{ color: isDiv0 ? accent : muted }}>
+          <span className={labelClass} style={{ color: isDiv0 ? accent : muted }}>
             {isDiv0 ? "Error" : "Error notice"}
           </span>
           <span className="mt-2 flex items-start gap-2 text-sm leading-relaxed">
-            {isDiv0 ? <AlertCircle aria-hidden="true" className="mt-[2px] h-4 w-4 shrink-0" /> : null}
+            {isDiv0 ? (
+              <AlertCircle aria-hidden="true" className="mt-[2px] h-4 w-4 shrink-0" />
+            ) : null}
             {isDiv0
               ? "Cannot divide by zero — press C and enter a new value."
               : "Clear so far. A division by zero is caught and reported here; the calculator never crashes."}
@@ -515,10 +593,18 @@ export default function Screen() {
         <KeyBtn {...keyProps("4", { wf: "b-5-0", disabled: locked })} />
         <KeyBtn {...keyProps("5", { wf: "b-5-1", disabled: locked })} />
         <KeyBtn {...keyProps("6", { wf: "b-5-2", disabled: locked })} />
-        <KeyBtn {...keyProps("−", { wf: "b-5-3", aria: "Subtract", variant: "op", disabled: locked })} />
+        <KeyBtn
+          {...keyProps("-", {
+            wf: "b-5-3",
+            aria: "Subtract",
+            variant: "op",
+            label: "−",
+            disabled: locked,
+          })}
+        />
 
         <p data-wf="b-5-4" className={sideNote} style={noteStyle}>
-          <span className={label} style={{ color: muted }}>
+          <span className={labelClass} style={{ color: muted }}>
             Keyboard
           </span>
           <span className="mt-2 text-sm leading-relaxed">
@@ -533,19 +619,28 @@ export default function Screen() {
         <KeyBtn {...keyProps("+", { wf: "b-6-3", aria: "Add", variant: "op", disabled: locked })} />
 
         <p data-wf="b-6-4" className={sideNote} style={noteStyle}>
-          <span className={label} style={{ color: muted }}>
+          <span className={labelClass} style={{ color: muted }}>
             Access
           </span>
           <span className="mt-2 text-sm leading-relaxed">
-            Every control is reachable by Tab, shows a focus outline and is labelled for screen readers; the result is
-            announced on change.
+            Every control is reachable by Tab, shows a focus outline and is labelled for screen
+            readers; the result is announced on change.
           </span>
         </p>
 
         {/* ROW 8 */}
-        <KeyBtn {...keyProps("0", { wf: "b-7-0", span: "col-span-6 lg:col-span-4", disabled: locked })} />
+        <KeyBtn
+          {...keyProps("0", { wf: "b-7-0", span: "col-span-6 lg:col-span-4", disabled: locked })}
+        />
         <KeyBtn {...keyProps(".", { wf: "b-7-1", aria: "Decimal point", disabled: locked })} />
-        <KeyBtn {...keyProps("=", { wf: "b-7-2", aria: "Equals — show the result", variant: "equals", disabled: locked })} />
+        <KeyBtn
+          {...keyProps("=", {
+            wf: "b-7-2",
+            aria: "Equals — show the result",
+            variant: "equals",
+            disabled: locked,
+          })}
+        />
 
         <div className="col-span-12 lg:col-span-4 flex items-center">
           <button
@@ -566,8 +661,9 @@ export default function Screen() {
           className="col-span-12 pt-4 text-[13px] leading-relaxed"
           style={{ borderTop: `1px dashed ${muted}`, fontFamily: MONO, color: muted }}
         >
-          Free to use with no account. The page is under 50 KB and all calculations run in your browser, so it keeps
-          working on slow connections and adapts to phone, tablet and desktop screens.
+          Free to use with no account. The page is under 50 KB and all calculations run in your
+          browser, so it keeps working on slow connections and adapts to phone, tablet and desktop
+          screens.
         </p>
       </div>
     </div>
