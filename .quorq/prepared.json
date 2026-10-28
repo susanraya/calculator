@@ -1,0 +1,26 @@
+{
+  "key": {
+    "app_design_id": "a7069b09-7731-45a7-b3ab-f06942fa413e",
+    "app_design_version": 1,
+    "architecture_document_id": "d2ccf8df-e526-4a2b-b8bc-15feca11546a",
+    "architecture_version": 1
+  },
+  "outcome": "prepared",
+  "packages": [
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "decimal.js",
+      "status": "skipped",
+      "version": ">=10.4.0"
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "vitest-axe",
+      "status": "skipped",
+      "version": ""
+    }
+  ],
+  "prepared_by_run": "d5be9a79-67d0-4ec7-b6da-9f6f79e68b0d"
+}
